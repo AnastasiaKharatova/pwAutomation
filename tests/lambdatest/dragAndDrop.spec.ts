@@ -5,4 +5,4 @@ it.describe('DRAG AND DROP', () => {
         //let dragAndDrop = new DragAndDrop(page)
         page.goto(`${process.env.LAMBDA}/selenium-playground/drag-and-drop-demo`)
     })
-})
+});
