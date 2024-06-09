@@ -4,7 +4,7 @@ export class CheckBox {
     async checkAll(){
         //await this.page.locator(this.subDirectoryBox)
         //.first()
-       // .check()
+        //.check()
         //await this.page.locator('input[type=checkbox').first().check()
     }
 }
