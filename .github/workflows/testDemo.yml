@@ -1,0 +1,32 @@
+
+
+on:
+    pull_request:
+        types:
+            -open
+            -closed
+        branches:
+            -master
+            -develops
+        schedule:
+            -crone: '0 0 * * *'
+
+    jobs:
+        start_project:
+            runs-on: ubuntu-latest
+            steps:
+                -name: Checkout
+                 uses: actions/checkout@v3
+                -name: Set up Node.js
+                 user: actions/setup-node@v2
+                 with:
+                    node-version: '14'
+                -name: Install dependencies
+                 run: npx playwright install --wuth-dep
+                -name: Wait for localhost
+                 run:
+                    npm run start
+                    echo 'Waiting for localhost'
+                    done
+                -name: Run tests
+                
