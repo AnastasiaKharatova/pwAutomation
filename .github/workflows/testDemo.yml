@@ -1,0 +1,137 @@
+name: testDemo
+
+on:
+  pull_request:
+    types:
+      - opened
+      - closed
+    branches:
+      - master
+      - develop
+      - feat/*
+      - bugfix/*
+      - hotfix/*
+      - release/*
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+      - develop
+      - feat/*
+      - bugfix/*
+      - hotfix/*
+      - release/*
+    paths-ignore:
+      - '**.md'
+      - '**.yml'
+      - '**.yaml'
+      - '**.json'
+      - '**.sh'
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  start_project:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+      - name: Install dependencies
+        run: npm i --force
+      - name: Install Playwright
+        run: npx playwright install --with-deps
+      - name: Wait for localhost
+        run: |
+          npm run start &
+          until $(curl --output /dev/null --silent --head --fail http://localhost:4200); do
+            echo "Waiting for localhost to be available..."
+            sleep 5
+          done
+      - name: Run tests
+          - 4200:4200
+        run: npm run projectTest
+  building_project:
+    needs: start_project
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install dependencies
+        run: npm ci --force
+      - name: Install Playwright
+        run: npx playwright install --with-deps
+      - name: Run test
+        run: npm run lambdaTest
+
+
+
+
+#                 - name: Wait for localhost
+#         run: |
+#           npm run start &
+#           until $(curl --output /dev/null --silent --head --fail http://localhost:4200); do
+#             echo "Waiting for localhost to be available..."
+#             sleep 5
+#           done
+#           name: Deploy website
+# on:
+#   push:
+#     branches:
+#       - master
+# jobs:
+#   test:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Get code
+#         uses: actions/checkout@v3
+#       - name: Install dependencies
+#         run: npm ci
+#       - name: Lint code
+#         run: npm run lint
+#       - name: Test code
+#         run: npm run test
+#   build:
+#     needs: test
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Get code
+#         uses: actions/checkout@v3
+#       - name: Install dependencies
+#         run: npm ci
+#       - name: Build website
+#         run: npm run build
+#       - name: Upload artifacts
+#         uses: actions/upload-artifact@v3
+#         with:
+#           name: dist-files
+#           path: dist
+#           # path: |
+#           #   dist
+#           #   package.json
+
+#   deploy:
+#     needs: build
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Get build artifacts
+#         uses: actions/download-artifact@v3
+#         with:
+#           name: dist-files
+#       - name: Output contents
+#         run: ls
+#       - name: Deploy
+#         run: echo "Deploying..."
+
+
+
+# curl --output /dev/null --silent --head --fail http://localhost:4200:
+# curl: The command-line tool used to make HTTP requests.
+# --output /dev/null: Discards the output, effectively ignoring any response body.
+# --silent: Runs curl silently, without showing progress or error messages.
+# --head: Fetches only the headers of the response, not the body.
+# --fail: Returns an error code if the HTTP request fails (e.g., the server is not responding, or it returns a 4xx or 5xx status code).
+# http://localhost:4200: The URL to check.
